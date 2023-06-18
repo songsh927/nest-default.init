@@ -2,15 +2,15 @@ import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { LoggerMiddleware } from './middleware/logger.middleware';
 import * as winston from 'winston';
 import { 
     utilities as nestWinstonModuleUtilities,
     WinstonModule 
 } from 'nest-winston';
-import defaultConfig from './config/defaultConfig';
+import defaultConfig from './config/default.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { middlewareList } from './middleware/middleware.config';
 
 @Module({
     imports: [
@@ -22,27 +22,27 @@ import { SequelizeModule } from '@nestjs/sequelize';
             isGlobal: true
         }),
 
-        // TypeORM
-        TypeOrmModule.forRoot({
-            type: 'mysql',
-            host: '',
-            port: 3306,
-            username: '',
-            password: '',
-            database: '',
-            entities: [__dirname + `/**/*.entity{.ts,.js}`],
-        }),
+        // // TypeORM
+        // TypeOrmModule.forRoot({
+        //     type: 'mysql',
+        //     host: '',
+        //     port: 3306,
+        //     username: '',
+        //     password: '',
+        //     database: '',
+        //     entities: [__dirname + `/**/*.entity{.ts,.js}`],
+        // }),
 
-        // Sequelize
-        SequelizeModule.forRoot({
-            dialect: 'mysql',
-            host: '',
-            port: 3306,
-            username: '',
-            password: '',
-            database: '',
-            models: [__dirname + `/**/*.entity{.ts,.js}`],
-        }),
+        // // Sequelize
+        // SequelizeModule.forRoot({
+        //     dialect: 'mysql',
+        //     host: '',
+        //     port: 3306,
+        //     username: '',
+        //     password: '',
+        //     database: '',
+        //     models: [__dirname + `/**/*.entity{.ts,.js}`],
+        // }),
 
         // Logging
         WinstonModule.forRoot({
@@ -56,17 +56,18 @@ import { SequelizeModule } from '@nestjs/sequelize';
                 })
             ]
         }),
-
     ],
 
     controllers: [AppController],
     providers: [AppService],
+    
 })
 
 export class AppModule {
-    configure(consumer: MiddlewareConsumer): any {
-        consumer
-        .apply(LoggerMiddleware)
-        .forRoutes('/users');
+
+    // Middleware
+    configure(consumer : MiddlewareConsumer): any {
+        middlewareList(consumer);
     }
+
 }
